@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BNF Playground</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Syne:wght@400;700;800&display=swap');
+
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #1a1e2a;
+    --border: #252a38;
+    --accent: #5eff9e;
+    --accent2: #ff5e8a;
+    --accent3: #5eb8ff;
+    --text: #cdd4e8;
+    --text-dim: #5a6480;
+    --text-mid: #8892aa;
+    --ok: #5eff9e;
+    --err: #ff5e8a;
+    --warn: #ffd05e;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 28px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--accent); }
+
+  .badge {
+    font-size: 0.65rem;
+    background: var(--accent);
+    color: #000;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .header-right {
+    margin-left: auto;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 7px 18px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+  }
+  .btn-primary:hover { background: #7fffb4; transform: translateY(-1px); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-mid);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-danger {
+    background: transparent;
+    color: var(--err);
+    border: 1px solid #ff5e8a44;
+  }
+  .btn-danger:hover { background: #ff5e8a18; }
+
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr auto;
+    flex: 1;
+    gap: 0;
+    min-height: 0;
+  }
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    min-height: 0;
+  }
+  .panel:last-child { border-right: none; }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-mid);
+    flex-shrink: 0;
+  }
+
+  .panel-header .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .panel-header .dot.red { background: var(--err); }
+  .panel-header .dot.blue { background: var(--accent3); }
+
+  .panel-header .rule-select {
+    margin-left: auto;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    outline: none;
+  }
+  .panel-header .rule-select:focus { border-color: var(--accent); }
+
+  textarea {
+    flex: 1;
+    background: var(--surface2);
+    border: none;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    padding: 18px 20px;
+    resize: none;
+    outline: none;
+    tab-size: 2;
+  }
+  textarea::placeholder { color: var(--text-dim); }
+  textarea:focus { background: #1c2030; }
+
+  .input-area {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+    max-height: 180px;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  #testInput {
+    flex: 1;
+    background: var(--surface2);
+    border: none;
+    border-right: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    padding: 12px 16px;
+    outline: none;
+    max-height: 100px;
+    resize: none;
+  }
+  #testInput:focus { background: #1c2030; }
+
+  .validate-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0 22px;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .validate-btn:hover { background: #7fffb4; }
+
+  .results-panel {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    max-height: 220px;
+    flex-shrink: 0;
+  }
+
+  .results-scroll {
+    overflow-y: auto;
+    flex: 1;
+    padding: 14px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .result-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    animation: fadeIn 0.2s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  .result-item.ok {
+    background: #5eff9e10;
+    border: 1px solid #5eff9e30;
+  }
+  .result-item.err {
+    background: #ff5e8a10;
+    border: 1px solid #ff5e8a30;
+  }
+  .result-item.info {
+    background: #5eb8ff10;
+    border: 1px solid #5eb8ff30;
+  }
+  .result-item.warn {
+    background: #ffd05e10;
+    border: 1px solid #ffd05e30;
+  }
+
+  .result-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+  .result-content { flex: 1; }
+  .result-label {
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .result-item.ok .result-label { color: var(--ok); }
+  .result-item.err .result-label { color: var(--err); }
+  .result-item.info .result-label { color: var(--accent3); }
+  .result-item.warn .result-label { color: var(--warn); }
+
+  .result-text { color: var(--text-mid); word-break: break-all; }
+  .result-text code {
+    background: var(--surface);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--text);
+    font-size: 0.8rem;
+  }
+
+  .rules-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    max-height: 80px;
+    overflow-y: auto;
+  }
+
+  .rule-chip {
+    font-size: 0.7rem;
+    padding: 2px 9px;
+    border-radius: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-mid);
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .rule-chip:hover, .rule-chip.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: #5eff9e10;
+  }
+
+  .empty-state {
+    color: var(--text-dim);
+    font-size: 0.78rem;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .stats-bar {
+    display: flex;
+    gap: 20px;
+    padding: 8px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+  .stat { display: flex; gap: 6px; align-items: center; }
+  .stat-val { color: var(--text-mid); font-weight: 600; }
+  .stat-val.ok { color: var(--ok); }
+  .stat-val.err { color: var(--err); }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+  .shortcut {
+    font-size: 0.65rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--text-dim);
+    margin-left: auto;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">BNF<span>lab</span></div>
+  <div class="badge">LOCAL</div>
+  <div class="header-right">
+    <button class="btn btn-ghost" onclick="loadExample()">Cargar ejemplo</button>
+    <button class="btn btn-ghost" onclick="clearAll()">Limpiar</button>
+    <button class="btn btn-primary" onclick="parseGrammar()">⚡ Compilar gramática</button>
+  </div>
+</header>
+
+<div class="main">
+  <!-- Panel izquierdo: gramática -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="dot"></div>
+      Gramática BNF/EBNF
+      <span class="shortcut">Ctrl+Enter para compilar</span>
+    </div>
+    <textarea id="grammarInput" placeholder="Escribe tu gramática aquí...
+Ejemplo:
+<letra> ::= [a-z] | [A-Z]
+<palabra> ::= <letra>+
+<saludo> ::= &quot;hola&quot; | &quot;adios&quot;"></textarea>
+  </div>
+
+  <!-- Panel derecho: prueba -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="dot blue"></div>
+      Reglas detectadas
+      <select class="rule-select" id="rootRuleSelect">
+        <option value="">— regla raíz —</option>
+      </select>
+    </div>
+    <div class="rules-list" id="rulesList">
+      <span class="empty-state">Compila la gramática para ver las reglas</span>
+    </div>
+    <div class="panel-header" style="border-top:1px solid var(--border);">
+      <div class="dot red"></div>
+      Texto a validar
+    </div>
+    <textarea id="testInput" placeholder="Escribe aquí el texto que quieres validar contra la regla seleccionada..."></textarea>
+    <div class="input-row">
+      <button class="validate-btn" style="width:60%;padding:12px;" onclick="validateInput()">▶ Validar entrada</button>
+      <button class="validate-btn" style="width:40%;padding:12px;background:var(--accent3);color:#000;" onclick="generateExamples()">✦ Generar ejemplos</button>
+    </div>
+  </div>
+
+  <!-- Panel inferior: resultados -->
+  <div class="results-panel">
+    <div class="panel-header">
+      <div class="dot"></div>
+      Resultados
+      <button class="btn btn-danger" style="margin-left:auto;padding:4px 12px;font-size:0.68rem;" onclick="clearResults()">Limpiar</button>
+    </div>
+    <div class="stats-bar" id="statsBar" style="display:none">
+      <div class="stat">Reglas: <span class="stat-val" id="statRules">0</span></div>
+      <div class="stat">Validaciones: <span class="stat-val" id="statTotal">0</span></div>
+      <div class="stat">Correctas: <span class="stat-val ok" id="statOk">0</span></div>
+      <div class="stat">Fallidas: <span class="stat-val err" id="statErr">0</span></div>
+      <div class="stat">Ejemplos generados: <span class="stat-val" style="color:var(--accent3)" id="statGen">0</span></div>
+    </div>
+    <div class="results-scroll" id="resultsContainer">
+      <div class="empty-state">Los resultados de validación aparecerán aquí</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// =====================================================
+// BNF PARSER ENGINE
+// =====================================================
+
+let parsedGrammar = null;
+let validCount = 0, invalidCount = 0, totalValidations = 0, genCount = 0;
+
+// =====================================================
+// GENERADOR DE EJEMPLOS
+// Genera cadenas aleatorias válidas a partir del AST
+// =====================================================
+
+function generateFromNode(node, rules, depth) {
+  if (depth > 60) return ''; // cortar recursión profunda
+
+  if (!node) return '';
+
+  switch (node.type) {
+    case 'EMPTY':
+      return '';
+
+    case 'LITERAL':
+      return node.val;
+
+    case 'CHARCLASS':
+      return randomFromCharClass(node.val);
+
+    case 'NONTERMINAL': {
+      const rule = rules[node.name];
+      if (!rule) return `<${node.name}>`;
+      return generateFromNode(rule, rules, depth + 1);
+    }
+
+    case 'ALT': {
+      // Elegir alternativa aleatoria; dar más peso a las más cortas en profundidad alta
+      const alts = node.alts;
+      const pick = depth > 30
+        ? alts[0]  // en profundidad alta, tomar la primera (suele ser la más simple)
+        : alts[Math.floor(Math.random() * alts.length)];
+      return generateFromNode(pick, rules, depth + 1);
+    }
+
+    case 'SEQ':
+      return node.items.map(item => generateFromNode(item, rules, depth + 1)).join('');
+
+    case 'STAR': {
+      // 0..N repeticiones, con tendencia a pocas
+      const n = depth > 25 ? 0 : randomCount(0, 3);
+      let s = '';
+      for (let i = 0; i < n; i++) s += generateFromNode(node.inner, rules, depth + 1);
+      return s;
+    }
+
+    case 'PLUS': {
+      const n = depth > 25 ? 1 : randomCount(1, 4);
+      let s = '';
+      for (let i = 0; i < n; i++) s += generateFromNode(node.inner, rules, depth + 1);
+      return s;
+    }
+
+    case 'OPT':
+      return (depth > 30 || Math.random() < 0.4) ? '' : generateFromNode(node.inner, rules, depth + 1);
+
+    default:
+      return '';
+  }
+}
+
+function randomCount(min, max) {
+  // Distribución sesgada hacia valores pequeños
+  const r = Math.random();
+  return min + Math.floor(r * r * (max - min + 1));
+}
+
+function randomFromCharClass(pattern) {
+  // Expandir el patrón en un array de caracteres posibles
+  const chars = [];
+  let i = 0;
+  let negate = false;
+  if (pattern[0] === '^') { negate = true; i = 1; }
+
+  while (i < pattern.length) {
+    if (i + 2 < pattern.length && pattern[i+1] === '-') {
+      const from = pattern.charCodeAt(i);
+      const to = pattern.charCodeAt(i+2);
+      for (let c = from; c <= to; c++) chars.push(String.fromCharCode(c));
+      i += 3;
+    } else {
+      chars.push(pattern[i]);
+      i++;
+    }
+  }
+
+  if (negate) {
+    // Para negación, generar letra minúscula aleatoria que no esté en el set
+    const fallback = [];
+    for (let c = 32; c < 127; c++) {
+      const ch = String.fromCharCode(c);
+      if (!chars.includes(ch)) fallback.push(ch);
+    }
+    if (fallback.length === 0) return '?';
+    return fallback[Math.floor(Math.random() * fallback.length)];
+  }
+
+  if (chars.length === 0) return '';
+  return chars[Math.floor(Math.random() * chars.length)];
+}
+
+function generateExamples() {
+  if (!parsedGrammar) {
+    addResult('warn', 'Gramática no compilada', 'Compila la gramática primero (⚡ Compilar gramática)');
+    return;
+  }
+  const rootRule = document.getElementById('rootRuleSelect').value;
+  if (!rootRule) {
+    addResult('warn', 'Sin regla seleccionada', 'Selecciona la regla raíz en el dropdown.');
+    return;
+  }
+  if (!parsedGrammar[rootRule]) {
+    addResult('err', 'Regla no encontrada', `<${rootRule}> no existe en la gramática compilada.`);
+    return;
+  }
+
+  const COUNT = 5;
+  const examples = [];
+  let attempts = 0;
+  while (examples.length < COUNT && attempts < 80) {
+    attempts++;
+    try {
+      const gen = generateFromNode(parsedGrammar[rootRule], parsedGrammar, 0);
+      // Verificar que el ejemplo generado sea válido
+      const check = validate(gen, rootRule, parsedGrammar);
+      if (check.ok && !examples.includes(gen)) examples.push(gen);
+    } catch(e) { /* ignorar errores individuales */ }
+  }
+
+  if (examples.length === 0) {
+    addResult('warn', `Sin ejemplos para <${rootRule}>`, 'No se pudieron generar ejemplos válidos. Puede haber recursión muy profunda o reglas sin terminales base.');
+    return;
+  }
+
+  genCount += examples.length;
+  updateStatsBar();
+
+  const listHtml = examples.map((ex, i) =>
+    `<div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+      <span style="color:var(--accent3);font-size:0.7rem;min-width:16px">${i+1}.</span>
+      <code style="flex:1;background:var(--surface);padding:3px 8px;border-radius:4px;word-break:break-all;">${escHtml(ex === '' ? '(cadena vacía)' : ex)}</code>
+      <button onclick="useExample(${JSON.stringify(ex)})" style="font-family:inherit;font-size:0.65rem;padding:2px 8px;border-radius:4px;background:transparent;border:1px solid var(--border);color:var(--text-mid);cursor:pointer;" onmouseover="this.style.borderColor='var(--accent3)';this.style.color='var(--accent3)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-mid)'">usar ↗</button>
+    </div>`
+  ).join('');
+
+  addResult('info',
+    `✦ ${examples.length} ejemplos generados para <${rootRule}>`,
+    listHtml + (attempts >= 80 && examples.length < COUNT ? `<div style="margin-top:6px;color:var(--warn);font-size:0.72rem;">⚠ Solo se pudieron generar ${examples.length} de ${COUNT} ejemplos distintos.</div>` : '')
+  );
+}
+
+function useExample(text) {
+  document.getElementById('testInput').value = text;
+  document.getElementById('testInput').focus();
+}
+
+
+// Tokenizer para la gramática
+function tokenizeGrammar(src) {
+  const tokens = [];
+  let i = 0;
+  while (i < src.length) {
+    // Saltar espacios y saltos de línea entre reglas (pero no dentro de literales)
+    if (src[i] === '\n' || src[i] === '\r') { i++; continue; }
+    if (src[i] === ' ' || src[i] === '\t') { i++; continue; }
+
+    // Comentario de línea con //
+    if (src[i] === '/' && src[i+1] === '/') {
+      while (i < src.length && src[i] !== '\n') i++;
+      continue;
+    }
+
+    // Comentario con #
+    if (src[i] === '#') {
+      while (i < src.length && src[i] !== '\n') i++;
+      continue;
+    }
+
+    // ::=
+    if (src.slice(i, i+3) === '::=') {
+      tokens.push({ type: 'ASSIGN', val: '::=' });
+      i += 3; continue;
+    }
+
+    // |
+    if (src[i] === '|') {
+      tokens.push({ type: 'ALT', val: '|' }); i++; continue;
+    }
+
+    // Cuantificadores
+    if (src[i] === '*') { tokens.push({ type: 'STAR' }); i++; continue; }
+    if (src[i] === '+') { tokens.push({ type: 'PLUS' }); i++; continue; }
+    if (src[i] === '?') { tokens.push({ type: 'OPT' }); i++; continue; }
+
+    // Paréntesis de agrupación
+    if (src[i] === '(') { tokens.push({ type: 'LPAREN' }); i++; continue; }
+    if (src[i] === ')') { tokens.push({ type: 'RPAREN' }); i++; continue; }
+
+    // Clase de caracteres [a-z], [A-Z], [0-9], [1-9]
+    if (src[i] === '[') {
+      let j = i + 1;
+      while (j < src.length && src[j] !== ']') j++;
+      const inner = src.slice(i+1, j);
+      tokens.push({ type: 'CHARCLASS', val: inner });
+      i = j + 1; continue;
+    }
+
+    // Literal entre comillas dobles
+    if (src[i] === '"') {
+      let j = i + 1;
+      while (j < src.length && src[j] !== '"') {
+        if (src[j] === '\\') j++;
+        j++;
+      }
+      const lit = src.slice(i+1, j);
+      tokens.push({ type: 'LITERAL', val: lit });
+      i = j + 1; continue;
+    }
+
+    // Literal entre comillas simples
+    if (src[i] === "'") {
+      let j = i + 1;
+      while (j < src.length && src[j] !== "'") {
+        if (src[j] === '\\') j++;
+        j++;
+      }
+      const lit = src.slice(i+1, j);
+      tokens.push({ type: 'LITERAL', val: lit });
+      i = j + 1; continue;
+    }
+
+    // No-terminal <nombre>
+    if (src[i] === '<') {
+      let j = i + 1;
+      while (j < src.length && src[j] !== '>') j++;
+      const name = src.slice(i+1, j);
+      tokens.push({ type: 'NONTERMINAL', val: name });
+      i = j + 1; continue;
+    }
+
+    i++;
+  }
+  return tokens;
+}
+
+// Parser de la gramática (convierte tokens en AST de reglas)
+function parseGrammarTokens(tokens) {
+  const rules = {};
+  let i = 0;
+
+  function parseAlternatives() {
+    const alts = [parseSequence()];
+    while (i < tokens.length && tokens[i]?.type === 'ALT') {
+      i++; // consumir |
+      alts.push(parseSequence());
+    }
+    return alts.length === 1 ? alts[0] : { type: 'ALT', alts };
+  }
+
+  function parseSequence() {
+    const items = [];
+    while (i < tokens.length) {
+      const t = tokens[i];
+      if (!t || t.type === 'ALT' || t.type === 'RPAREN') break;
+      if (t.type === 'ASSIGN') break;
+      // Si el siguiente token es un NONTERMINAL que podría ser el lado izq de una regla
+      // (seguido de ASSIGN), parar
+      if (t.type === 'NONTERMINAL' && tokens[i+1]?.type === 'ASSIGN') break;
+      items.push(parsePrimary());
+    }
+    if (items.length === 0) return { type: 'EMPTY' };
+    if (items.length === 1) return items[0];
+    return { type: 'SEQ', items };
+  }
+
+  function parsePrimary() {
+    let node = parseAtom();
+    // Cuantificadores
+    if (i < tokens.length) {
+      if (tokens[i]?.type === 'STAR') { i++; return { type: 'STAR', inner: node }; }
+      if (tokens[i]?.type === 'PLUS') { i++; return { type: 'PLUS', inner: node }; }
+      if (tokens[i]?.type === 'OPT')  { i++; return { type: 'OPT',  inner: node }; }
+    }
+    return node;
+  }
+
+  function parseAtom() {
+    const t = tokens[i];
+    if (!t) return { type: 'EMPTY' };
+
+    if (t.type === 'LPAREN') {
+      i++;
+      const inner = parseAlternatives();
+      if (tokens[i]?.type === 'RPAREN') i++;
+      return inner;
+    }
+    if (t.type === 'LITERAL') {
+      i++;
+      return { type: 'LITERAL', val: processEscapes(t.val) };
+    }
+    if (t.type === 'NONTERMINAL') {
+      i++;
+      return { type: 'NONTERMINAL', name: t.val };
+    }
+    if (t.type === 'CHARCLASS') {
+      i++;
+      return { type: 'CHARCLASS', val: t.val };
+    }
+    i++;
+    return { type: 'EMPTY' };
+  }
+
+  function processEscapes(s) {
+    return s.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\r/g, '\r');
+  }
+
+  // Parsear todas las reglas
+  while (i < tokens.length) {
+    if (tokens[i]?.type === 'NONTERMINAL' && tokens[i+1]?.type === 'ASSIGN') {
+      const name = tokens[i].val;
+      i += 2; // saltar nombre y ::=
+      const def = parseAlternatives();
+      rules[name] = def;
+    } else {
+      i++;
+    }
+  }
+
+  return rules;
+}
+
+// Matcher: intenta hacer match del AST contra una cadena
+// Devuelve array de posiciones finales posibles (memoized)
+const matchCache = {};
+
+function matchNode(node, str, pos, rules, depth) {
+  if (depth > 200) return []; // protección recursión
+
+  const key = `${node.type}:${pos}`;
+
+  if (!node) return [pos];
+
+  switch (node.type) {
+    case 'EMPTY':
+      return [pos];
+
+    case 'LITERAL': {
+      const val = node.val;
+      // Comparación con escape de salto de línea, etc.
+      if (str.startsWith(val, pos)) return [pos + val.length];
+      return [];
+    }
+
+    case 'CHARCLASS': {
+      if (pos >= str.length) return [];
+      const ch = str[pos];
+      if (matchCharClass(node.val, ch)) return [pos + 1];
+      return [];
+    }
+
+    case 'NONTERMINAL': {
+      const rule = rules[node.name];
+      if (!rule) return []; // regla no definida
+      return matchNode(rule, str, pos, rules, depth + 1);
+    }
+
+    case 'ALT': {
+      const results = new Set();
+      for (const alt of node.alts) {
+        for (const p of matchNode(alt, str, pos, rules, depth + 1)) results.add(p);
+      }
+      return [...results];
+    }
+
+    case 'SEQ': {
+      let positions = [pos];
+      for (const item of node.items) {
+        const next = new Set();
+        for (const p of positions) {
+          for (const np of matchNode(item, str, p, rules, depth + 1)) next.add(np);
+        }
+        positions = [...next];
+        if (positions.length === 0) return [];
+      }
+      return positions;
+    }
+
+    case 'STAR': {
+      const results = new Set();
+      let frontier = [pos];
+      results.add(pos);
+      let safety = 0;
+      while (frontier.length > 0 && safety++ < 500) {
+        const next = new Set();
+        for (const p of frontier) {
+          for (const np of matchNode(node.inner, str, p, rules, depth + 1)) {
+            if (!results.has(np)) { results.add(np); next.add(np); }
+          }
+        }
+        frontier = [...next];
+      }
+      return [...results];
+    }
+
+    case 'PLUS': {
+      const first = matchNode(node.inner, str, pos, rules, depth + 1);
+      if (first.length === 0) return [];
+      const results = new Set(first);
+      let frontier = [...first];
+      let safety = 0;
+      while (frontier.length > 0 && safety++ < 500) {
+        const next = new Set();
+        for (const p of frontier) {
+          for (const np of matchNode(node.inner, str, p, rules, depth + 1)) {
+            if (!results.has(np)) { results.add(np); next.add(np); }
+          }
+        }
+        frontier = [...next];
+      }
+      return [...results];
+    }
+
+    case 'OPT': {
+      const results = new Set([pos]);
+      for (const p of matchNode(node.inner, str, pos, rules, depth + 1)) results.add(p);
+      return [...results];
+    }
+
+    default:
+      return [pos];
+  }
+}
+
+function matchCharClass(pattern, ch) {
+  // Soporta [a-z], [A-Z], [0-9], [1-9], [^...], combinaciones
+  let i = 0;
+  let negate = false;
+  if (pattern[0] === '^') { negate = true; i = 1; }
+
+  let matched = false;
+  while (i < pattern.length) {
+    if (i + 2 < pattern.length && pattern[i+1] === '-') {
+      if (ch >= pattern[i] && ch <= pattern[i+2]) { matched = true; }
+      i += 3;
+    } else {
+      if (ch === pattern[i]) { matched = true; }
+      i++;
+    }
+  }
+  return negate ? !matched : matched;
+}
+
+// Validar una cadena contra una regla
+function validate(inputStr, rootRule, rules) {
+  if (!rules[rootRule]) return { ok: false, error: `Regla <${rootRule}> no encontrada` };
+  const node = rules[rootRule];
+  const results = matchNode(node, inputStr, 0, rules, 0);
+  const fullMatch = results.includes(inputStr.length);
+  if (fullMatch) return { ok: true };
+
+  // Encontrar hasta dónde llegó el parser
+  const maxPos = results.length > 0 ? Math.max(...results) : 0;
+  return {
+    ok: false,
+    maxPos,
+    snippet: inputStr.slice(0, maxPos) + '⚑' + inputStr.slice(maxPos),
+    error: maxPos === 0
+      ? `No coincide desde el inicio`
+      : `Match parcial hasta posición ${maxPos}: "${inputStr.slice(0, maxPos)}" ✓, luego falla`
+  };
+}
+
+// =====================================================
+// UI
+// =====================================================
+
+function parseGrammar() {
+  const src = document.getElementById('grammarInput').value.trim();
+  if (!src) { addResult('warn', 'Gramática vacía', 'Escribe una gramática BNF primero.'); return; }
+
+  try {
+    const tokens = tokenizeGrammar(src);
+    const rules = parseGrammarTokens(tokens);
+    const ruleNames = Object.keys(rules);
+
+    if (ruleNames.length === 0) {
+      addResult('err', 'Sin reglas', 'No se detectaron reglas. Verifica la sintaxis (usa <nombre> ::= ...)');
+      return;
+    }
+
+    parsedGrammar = rules;
+    updateRulesList(ruleNames);
+    updateStatsBar();
+
+    addResult('ok', `Gramática compilada`, `Se detectaron ${ruleNames.length} reglas: ${ruleNames.map(r => `<${r}>`).join(', ')}`);
+
+    // Verificar referencias a reglas no definidas
+    const warnings = checkUndefinedRefs(rules, ruleNames);
+    if (warnings.length > 0) {
+      addResult('warn', 'Referencias no definidas', `Las siguientes reglas son referenciadas pero no definidas: ${warnings.map(r => `<${r}>`).join(', ')}`);
+    }
+
+  } catch(e) {
+    addResult('err', 'Error de compilación', e.message);
+  }
+}
+
+function checkUndefinedRefs(rules, defined) {
+  const defSet = new Set(defined);
+  const missing = new Set();
+  function walk(node) {
+    if (!node) return;
+    if (node.type === 'NONTERMINAL' && !defSet.has(node.name)) missing.add(node.name);
+    if (node.alts) node.alts.forEach(walk);
+    if (node.items) node.items.forEach(walk);
+    if (node.inner) walk(node.inner);
+  }
+  Object.values(rules).forEach(walk);
+  return [...missing];
+}
+
+function validateInput() {
+  if (!parsedGrammar) {
+    addResult('warn', 'Gramática no compilada', 'Compila la gramática primero (⚡ Compilar gramática)');
+    return;
+  }
+  const input = document.getElementById('testInput').value;
+  const rootRule = document.getElementById('rootRuleSelect').value;
+  if (!rootRule) {
+    addResult('warn', 'Sin regla seleccionada', 'Selecciona la regla raíz en el dropdown de arriba.');
+    return;
+  }
+
+  const result = validate(input, rootRule, parsedGrammar);
+  totalValidations++;
+
+  if (result.ok) {
+    validCount++;
+    addResult('ok', `✓ Válido contra <${rootRule}>`, `La entrada <code>${escHtml(input || '(vacío)')}</code> es válida.`);
+  } else {
+    invalidCount++;
+    addResult('err', `✗ Inválido contra <${rootRule}>`, result.error + (result.snippet ? `<br>Traza: <code>${escHtml(result.snippet)}</code>` : ''));
+  }
+
+  updateStatsBar();
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function addResult(type, label, text) {
+  const container = document.getElementById('resultsContainer');
+  const empty = container.querySelector('.empty-state');
+  if (empty) empty.remove();
+
+  const icons = { ok: '✓', err: '✗', info: 'ℹ', warn: '⚠' };
+  const div = document.createElement('div');
+  div.className = `result-item ${type}`;
+  div.innerHTML = `
+    <div class="result-icon">${icons[type] || '·'}</div>
+    <div class="result-content">
+      <div class="result-label">${label}</div>
+      <div class="result-text">${text}</div>
+    </div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function updateRulesList(ruleNames) {
+  const list = document.getElementById('rulesList');
+  const select = document.getElementById('rootRuleSelect');
+  list.innerHTML = '';
+  select.innerHTML = '<option value="">— regla raíz —</option>';
+
+  ruleNames.forEach((name, idx) => {
+    const chip = document.createElement('div');
+    chip.className = 'rule-chip';
+    chip.textContent = `<${name}>`;
+    chip.onclick = () => {
+      document.querySelectorAll('.rule-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      select.value = name;
+    };
+    list.appendChild(chip);
+
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = `<${name}>`;
+    select.appendChild(opt);
+
+    if (idx === 0) { select.value = name; chip.classList.add('active'); }
+  });
+
+  // Al hacer clic en el select, activar el chip correspondiente
+  select.onchange = () => {
+    document.querySelectorAll('.rule-chip').forEach(c => {
+      c.classList.toggle('active', c.textContent === `<${select.value}>`);
+    });
+  };
+}
+
+function updateStatsBar() {
+  const bar = document.getElementById('statsBar');
+  bar.style.display = 'flex';
+  document.getElementById('statRules').textContent = parsedGrammar ? Object.keys(parsedGrammar).length : 0;
+  document.getElementById('statTotal').textContent = totalValidations;
+  document.getElementById('statOk').textContent = validCount;
+  document.getElementById('statErr').textContent = invalidCount;
+  document.getElementById('statGen').textContent = genCount;
+}
+
+function clearResults() {
+  document.getElementById('resultsContainer').innerHTML = '<div class="empty-state">Los resultados de validación aparecerán aquí</div>';
+  validCount = 0; invalidCount = 0; totalValidations = 0; genCount = 0;
+  updateStatsBar();
+  document.getElementById('statsBar').style.display = 'none';
+}
+
+function clearAll() {
+  document.getElementById('grammarInput').value = '';
+  document.getElementById('testInput').value = '';
+  document.getElementById('rulesList').innerHTML = '<span class="empty-state">Compila la gramática para ver las reglas</span>';
+  document.getElementById('rootRuleSelect').innerHTML = '<option value="">— regla raíz —</option>';
+  parsedGrammar = null;
+  clearResults();
+}
+
+function loadExample() {
+  document.getElementById('grammarInput').value = `<letra> ::= [a-z] | [A-Z]
+<letras> ::= <letra>+
+<digito> ::= [0-9]
+<digito_no_0> ::= [1-9]
+<identificador> ::= <letras> (<letras> | <digito>)*
+<entero_pos> ::= "0" | <digito_no_0> <digito>*
+<entero_neg> ::= "-" <digito_no_0> <digito>*
+<enteros> ::= <entero_pos> | <entero_neg>
+<decimal> ::= "." <digito>+
+<numero> ::= <entero_pos> <decimal>? | <entero_neg> <decimal>? | "-" "0" <decimal>
+<tipos_datos> ::= "char" | "float" | "string" | "bool" | "int"
+<separador> ::= "~"
+<asignacion> ::= "<-"
+<final_expresion> ::= "!"
+<operando> ::= <identificador> | <numero>
+<factor> ::= <operando>
+<termino_mult> ::= <factor> (("*" | "/" | "%") <factor>)*
+<expresion> ::= <termino_mult> (("+" | "-") <termino_mult>)*
+<asignacion_var> ::= <asignacion> <expresion>
+<crear_var> ::= <tipos_datos> <separador> <identificador> <asignacion_var>? <final_expresion>`;
+  parseGrammar();
+  document.getElementById('testInput').value = 'int~miVariable<-42!';
+  document.getElementById('rootRuleSelect').value = 'crear_var';
+  document.querySelectorAll('.rule-chip').forEach(c => {
+    c.classList.toggle('active', c.textContent === '<crear_var>');
+  });
+}
+
+// Atajos de teclado
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    if (document.activeElement === document.getElementById('testInput')) {
+      validateInput();
+    } else {
+      parseGrammar();
+    }
+  }
+});
+</script>
+</body>
+</html>
