@@ -29,9 +29,10 @@
     background: var(--bg);
     color: var(--text);
     font-family: 'JetBrains Mono', monospace;
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
 
   header {
@@ -41,6 +42,7 @@
     padding: 14px 28px;
     border-bottom: 1px solid var(--border);
     background: var(--surface);
+    flex-shrink: 0;
   }
 
   .logo {
@@ -79,31 +81,27 @@
     transition: all 0.15s;
     letter-spacing: 0.3px;
   }
-  .btn-primary {
-    background: var(--accent);
-    color: #000;
-  }
+  .btn-primary { background: var(--accent); color: #000; }
   .btn-primary:hover { background: #7fffb4; transform: translateY(-1px); }
-  .btn-ghost {
-    background: transparent;
-    color: var(--text-mid);
-    border: 1px solid var(--border);
-  }
+  .btn-ghost { background: transparent; color: var(--text-mid); border: 1px solid var(--border); }
   .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-  .btn-danger {
-    background: transparent;
-    color: var(--err);
-    border: 1px solid #ff5e8a44;
-  }
+  .btn-danger { background: transparent; color: var(--err); border: 1px solid #ff5e8a44; }
   .btn-danger:hover { background: #ff5e8a18; }
 
-  .main {
+  /* ── Layout principal: columnas + terminal abajo ── */
+  .workspace {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .columns {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr auto;
     flex: 1;
-    gap: 0;
     min-height: 0;
+    overflow: hidden;
   }
 
   .panel {
@@ -111,6 +109,7 @@
     flex-direction: column;
     border-right: 1px solid var(--border);
     min-height: 0;
+    overflow: hidden;
   }
   .panel:last-child { border-right: none; }
 
@@ -129,11 +128,7 @@
     flex-shrink: 0;
   }
 
-  .panel-header .dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: var(--accent);
-  }
+  .panel-header .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
   .panel-header .dot.red { background: var(--err); }
   .panel-header .dot.blue { background: var(--accent3); }
 
@@ -162,123 +157,10 @@
     resize: none;
     outline: none;
     tab-size: 2;
+    min-height: 0;
   }
   textarea::placeholder { color: var(--text-dim); }
   textarea:focus { background: #1c2030; }
-
-  .input-area {
-    display: flex;
-    flex-direction: column;
-    border-top: 1px solid var(--border);
-    flex-shrink: 0;
-    max-height: 180px;
-  }
-
-  .input-row {
-    display: flex;
-    gap: 0;
-    border-top: 1px solid var(--border);
-  }
-
-  #testInput {
-    flex: 1;
-    background: var(--surface2);
-    border: none;
-    border-right: 1px solid var(--border);
-    color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.82rem;
-    padding: 12px 16px;
-    outline: none;
-    max-height: 100px;
-    resize: none;
-  }
-  #testInput:focus { background: #1c2030; }
-
-  .validate-btn {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.8rem;
-    font-weight: 700;
-    padding: 0 22px;
-    background: var(--accent);
-    color: #000;
-    border: none;
-    cursor: pointer;
-    letter-spacing: 0.5px;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-  .validate-btn:hover { background: #7fffb4; }
-
-  .results-panel {
-    grid-column: 1 / -1;
-    border-top: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    max-height: 220px;
-    flex-shrink: 0;
-  }
-
-  .results-scroll {
-    overflow-y: auto;
-    flex: 1;
-    padding: 14px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .result-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 10px 14px;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    line-height: 1.5;
-    animation: fadeIn 0.2s ease;
-  }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-
-  .result-item.ok {
-    background: #5eff9e10;
-    border: 1px solid #5eff9e30;
-  }
-  .result-item.err {
-    background: #ff5e8a10;
-    border: 1px solid #ff5e8a30;
-  }
-  .result-item.info {
-    background: #5eb8ff10;
-    border: 1px solid #5eb8ff30;
-  }
-  .result-item.warn {
-    background: #ffd05e10;
-    border: 1px solid #ffd05e30;
-  }
-
-  .result-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
-  .result-content { flex: 1; }
-  .result-label {
-    font-weight: 700;
-    font-size: 0.72rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-bottom: 3px;
-  }
-  .result-item.ok .result-label { color: var(--ok); }
-  .result-item.err .result-label { color: var(--err); }
-  .result-item.info .result-label { color: var(--accent3); }
-  .result-item.warn .result-label { color: var(--warn); }
-
-  .result-text { color: var(--text-mid); word-break: break-all; }
-  .result-text code {
-    background: var(--surface);
-    padding: 1px 5px;
-    border-radius: 3px;
-    color: var(--text);
-    font-size: 0.8rem;
-  }
 
   .rules-list {
     display: flex;
@@ -289,6 +171,7 @@
     background: var(--surface);
     max-height: 80px;
     overflow-y: auto;
+    flex-shrink: 0;
   }
 
   .rule-chip {
@@ -307,17 +190,98 @@
     background: #5eff9e10;
   }
 
-  .empty-state {
+  .input-row {
+    display: flex;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .validate-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 12px 0;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.15s;
+    white-space: nowrap;
+    flex: 1;
+  }
+  .validate-btn:hover { filter: brightness(1.15); }
+  .validate-btn + .validate-btn { border-left: 1px solid rgba(0,0,0,0.2); }
+
+  /* ── Terminal / Panel de resultados ── */
+  .terminal-section {
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    /* altura inicial, el usuario puede arrastrar el resizer */
+  }
+
+  .terminal-resizer {
+    height: 5px;
+    background: var(--border);
+    cursor: ns-resize;
+    flex-shrink: 0;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .terminal-resizer::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--text-dim);
+    transition: background 0.15s;
+  }
+  .terminal-resizer:hover,
+  .terminal-resizer.dragging { background: #3a4060; }
+  .terminal-resizer:hover::after,
+  .terminal-resizer.dragging::after { background: var(--accent); }
+
+  .terminal-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 18px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-mid);
+    flex-shrink: 0;
+    user-select: none;
+  }
+
+  .terminal-controls {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .term-size-hint {
+    font-size: 0.62rem;
     color: var(--text-dim);
-    font-size: 0.78rem;
-    padding: 20px;
-    text-align: center;
+    font-weight: 400;
+    letter-spacing: 0;
   }
 
   .stats-bar {
     display: flex;
-    gap: 20px;
-    padding: 8px 20px;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 6px 20px;
     border-bottom: 1px solid var(--border);
     background: var(--surface);
     font-size: 0.7rem;
@@ -329,10 +293,108 @@
   .stat-val.ok { color: var(--ok); }
   .stat-val.err { color: var(--err); }
 
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: var(--surface); }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+  .results-scroll {
+    overflow-y: auto;
+    flex: 1;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-height: 0;
+  }
+
+  .result-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    animation: fadeIn 0.18s ease;
+    flex-shrink: 0;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; } }
+
+  .result-item.ok  { background: #5eff9e10; border: 1px solid #5eff9e30; }
+  .result-item.err { background: #ff5e8a10; border: 1px solid #ff5e8a30; }
+  .result-item.info{ background: #5eb8ff10; border: 1px solid #5eb8ff30; }
+  .result-item.warn{ background: #ffd05e10; border: 1px solid #ffd05e30; }
+
+  .result-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+  .result-content { flex: 1; min-width: 0; }
+  .result-label {
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .result-item.ok  .result-label { color: var(--ok); }
+  .result-item.err .result-label { color: var(--err); }
+  .result-item.info .result-label { color: var(--accent3); }
+  .result-item.warn .result-label { color: var(--warn); }
+
+  .result-text { color: var(--text-mid); word-break: break-word; }
+  .result-text code {
+    background: var(--surface);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--text);
+    font-size: 0.8rem;
+    word-break: break-all;
+  }
+
+  /* Bloque de error detallado */
+  .err-detail {
+    margin-top: 8px;
+    background: var(--surface);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .err-detail-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 5px 10px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.75rem;
+  }
+  .err-detail-row:last-child { border-bottom: none; }
+  .err-key {
+    color: var(--text-dim);
+    min-width: 90px;
+    flex-shrink: 0;
+    font-size: 0.68rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .err-val { color: var(--text); word-break: break-all; }
+  .err-val.highlight { color: var(--err); }
+  .err-val.ok-part { color: var(--ok); }
+
+  /* Visor de traza de posición */
+  .trace-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1px;
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    line-height: 1.8;
+  }
+  .trace-char { padding: 1px 3px; border-radius: 2px; }
+  .trace-char.ok-ch  { color: var(--ok); background: #5eff9e15; }
+  .trace-char.fail-ch{ color: var(--err); background: #ff5e8a22; border-bottom: 2px solid var(--err); }
+  .trace-char.rest-ch{ color: var(--text-dim); }
+  .trace-cursor { color: var(--err); font-weight: 700; }
+
+  .empty-state {
+    color: var(--text-dim);
+    font-size: 0.78rem;
+    padding: 20px;
+    text-align: center;
+  }
 
   .shortcut {
     font-size: 0.65rem;
@@ -343,6 +405,11 @@
     color: var(--text-dim);
     margin-left: auto;
   }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
 </style>
 </head>
 <body>
@@ -357,221 +424,222 @@
   </div>
 </header>
 
-<div class="main">
-  <!-- Panel izquierdo: gramática -->
-  <div class="panel">
-    <div class="panel-header">
-      <div class="dot"></div>
-      Gramática BNF/EBNF
-      <span class="shortcut">Ctrl+Enter para compilar</span>
-    </div>
-    <textarea id="grammarInput" placeholder="Escribe tu gramática aquí...
+<div class="workspace" id="workspace">
+
+  <div class="columns" id="columns">
+    <!-- Panel izquierdo: gramática -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="dot"></div>
+        Gramática BNF/EBNF
+        <span class="shortcut">Ctrl+Enter para compilar</span>
+      </div>
+      <textarea id="grammarInput" placeholder="Escribe tu gramática aquí...
 Ejemplo:
 <letra> ::= [a-z] | [A-Z]
 <palabra> ::= <letra>+
 <saludo> ::= &quot;hola&quot; | &quot;adios&quot;"></textarea>
+    </div>
+
+    <!-- Panel derecho: prueba -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="dot blue"></div>
+        Reglas detectadas
+        <select class="rule-select" id="rootRuleSelect">
+          <option value="">— regla raíz —</option>
+        </select>
+      </div>
+      <div class="rules-list" id="rulesList">
+        <span class="empty-state">Compila la gramática para ver las reglas</span>
+      </div>
+      <div class="panel-header" style="border-top:1px solid var(--border);">
+        <div class="dot red"></div>
+        Texto a validar
+        <span class="shortcut">Ctrl+Enter para validar</span>
+      </div>
+      <textarea id="testInput" placeholder="Escribe aquí el texto que quieres validar contra la regla seleccionada..."></textarea>
+      <div class="input-row">
+        <button class="validate-btn" onclick="validateInput()">▶ Validar entrada</button>
+        <button class="validate-btn" style="background:var(--accent3);" onclick="generateExamples()">✦ Generar ejemplos</button>
+      </div>
+    </div>
   </div>
 
-  <!-- Panel derecho: prueba -->
-  <div class="panel">
-    <div class="panel-header">
-      <div class="dot blue"></div>
-      Reglas detectadas
-      <select class="rule-select" id="rootRuleSelect">
-        <option value="">— regla raíz —</option>
-      </select>
-    </div>
-    <div class="rules-list" id="rulesList">
-      <span class="empty-state">Compila la gramática para ver las reglas</span>
-    </div>
-    <div class="panel-header" style="border-top:1px solid var(--border);">
-      <div class="dot red"></div>
-      Texto a validar
-    </div>
-    <textarea id="testInput" placeholder="Escribe aquí el texto que quieres validar contra la regla seleccionada..."></textarea>
-    <div class="input-row">
-      <button class="validate-btn" style="width:60%;padding:12px;" onclick="validateInput()">▶ Validar entrada</button>
-      <button class="validate-btn" style="width:40%;padding:12px;background:var(--accent3);color:#000;" onclick="generateExamples()">✦ Generar ejemplos</button>
-    </div>
-  </div>
+  <!-- Resizer arrastrble -->
+  <div class="terminal-resizer" id="resizer"></div>
 
-  <!-- Panel inferior: resultados -->
-  <div class="results-panel">
-    <div class="panel-header">
+  <!-- Terminal de resultados (altura variable) -->
+  <div class="terminal-section" id="terminalSection">
+    <div class="terminal-header">
       <div class="dot"></div>
-      Resultados
-      <button class="btn btn-danger" style="margin-left:auto;padding:4px 12px;font-size:0.68rem;" onclick="clearResults()">Limpiar</button>
+      Terminal de resultados
+      <div class="terminal-controls">
+        <span class="term-size-hint" id="termSizeHint"></span>
+        <button class="btn btn-ghost" style="padding:3px 10px;font-size:0.67rem;" onclick="resetTerminalSize()">Restablecer</button>
+        <button class="btn btn-danger" style="padding:3px 10px;font-size:0.67rem;" onclick="clearResults()">Limpiar</button>
+      </div>
     </div>
     <div class="stats-bar" id="statsBar" style="display:none">
       <div class="stat">Reglas: <span class="stat-val" id="statRules">0</span></div>
       <div class="stat">Validaciones: <span class="stat-val" id="statTotal">0</span></div>
       <div class="stat">Correctas: <span class="stat-val ok" id="statOk">0</span></div>
       <div class="stat">Fallidas: <span class="stat-val err" id="statErr">0</span></div>
-      <div class="stat">Ejemplos generados: <span class="stat-val" style="color:var(--accent3)" id="statGen">0</span></div>
+      <div class="stat">Ejemplos: <span class="stat-val" style="color:var(--accent3)" id="statGen">0</span></div>
     </div>
     <div class="results-scroll" id="resultsContainer">
-      <div class="empty-state">Los resultados de validación aparecerán aquí</div>
+      <div class="empty-state">Los resultados de validación aparecerán aquí · Arrastra el borde superior para redimensionar</div>
     </div>
   </div>
+
 </div>
 
 <script>
 // =====================================================
+// RESIZER — terminal redimensionable
+// =====================================================
+(function() {
+  const resizer = document.getElementById('resizer');
+  const termSection = document.getElementById('terminalSection');
+  const columns = document.getElementById('columns');
+  const hint = document.getElementById('termSizeHint');
+
+  const DEFAULT_HEIGHT = 260;
+  let isResizing = false;
+  let startY = 0;
+  let startHeight = 0;
+
+  function applyHeight(h) {
+    const min = 80;
+    const max = window.innerHeight * 0.75;
+    h = Math.max(min, Math.min(max, h));
+    termSection.style.height = h + 'px';
+    termSection.style.flex = 'none';
+    hint.textContent = h + 'px';
+  }
+
+  applyHeight(DEFAULT_HEIGHT);
+
+  resizer.addEventListener('mousedown', e => {
+    isResizing = true;
+    startY = e.clientY;
+    startHeight = termSection.getBoundingClientRect().height;
+    resizer.classList.add('dragging');
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor = 'ns-resize';
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!isResizing) return;
+    const delta = startY - e.clientY; // arrastrar hacia arriba = más grande
+    applyHeight(startHeight + delta);
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!isResizing) return;
+    isResizing = false;
+    resizer.classList.remove('dragging');
+    document.body.style.userSelect = '';
+    document.body.style.cursor = '';
+  });
+
+  window.resetTerminalSize = function() {
+    applyHeight(DEFAULT_HEIGHT);
+  };
+})();
+
+// =====================================================
 // BNF PARSER ENGINE
 // =====================================================
-
 let parsedGrammar = null;
 let validCount = 0, invalidCount = 0, totalValidations = 0, genCount = 0;
 
-// =====================================================
-// GENERADOR DE EJEMPLOS
-// Genera cadenas aleatorias válidas a partir del AST
-// =====================================================
-
+// ── Generador de ejemplos ──────────────────────────
 function generateFromNode(node, rules, depth) {
-  if (depth > 60) return ''; // cortar recursión profunda
-
+  if (depth > 60) return '';
   if (!node) return '';
-
   switch (node.type) {
-    case 'EMPTY':
-      return '';
-
-    case 'LITERAL':
-      return node.val;
-
-    case 'CHARCLASS':
-      return randomFromCharClass(node.val);
-
+    case 'EMPTY': return '';
+    case 'LITERAL': return node.val;
+    case 'CHARCLASS': return randomFromCharClass(node.val);
     case 'NONTERMINAL': {
       const rule = rules[node.name];
       if (!rule) return `<${node.name}>`;
       return generateFromNode(rule, rules, depth + 1);
     }
-
     case 'ALT': {
-      // Elegir alternativa aleatoria; dar más peso a las más cortas en profundidad alta
       const alts = node.alts;
-      const pick = depth > 30
-        ? alts[0]  // en profundidad alta, tomar la primera (suele ser la más simple)
-        : alts[Math.floor(Math.random() * alts.length)];
+      const pick = depth > 30 ? alts[0] : alts[Math.floor(Math.random() * alts.length)];
       return generateFromNode(pick, rules, depth + 1);
     }
-
     case 'SEQ':
-      return node.items.map(item => generateFromNode(item, rules, depth + 1)).join('');
-
+      return node.items.map(i => generateFromNode(i, rules, depth + 1)).join('');
     case 'STAR': {
-      // 0..N repeticiones, con tendencia a pocas
       const n = depth > 25 ? 0 : randomCount(0, 3);
-      let s = '';
-      for (let i = 0; i < n; i++) s += generateFromNode(node.inner, rules, depth + 1);
-      return s;
+      let s = ''; for (let i = 0; i < n; i++) s += generateFromNode(node.inner, rules, depth + 1); return s;
     }
-
     case 'PLUS': {
       const n = depth > 25 ? 1 : randomCount(1, 4);
-      let s = '';
-      for (let i = 0; i < n; i++) s += generateFromNode(node.inner, rules, depth + 1);
-      return s;
+      let s = ''; for (let i = 0; i < n; i++) s += generateFromNode(node.inner, rules, depth + 1); return s;
     }
-
     case 'OPT':
       return (depth > 30 || Math.random() < 0.4) ? '' : generateFromNode(node.inner, rules, depth + 1);
-
-    default:
-      return '';
+    default: return '';
   }
 }
 
 function randomCount(min, max) {
-  // Distribución sesgada hacia valores pequeños
   const r = Math.random();
   return min + Math.floor(r * r * (max - min + 1));
 }
 
 function randomFromCharClass(pattern) {
-  // Expandir el patrón en un array de caracteres posibles
   const chars = [];
-  let i = 0;
-  let negate = false;
+  let i = 0, negate = false;
   if (pattern[0] === '^') { negate = true; i = 1; }
-
   while (i < pattern.length) {
     if (i + 2 < pattern.length && pattern[i+1] === '-') {
-      const from = pattern.charCodeAt(i);
-      const to = pattern.charCodeAt(i+2);
-      for (let c = from; c <= to; c++) chars.push(String.fromCharCode(c));
+      for (let c = pattern.charCodeAt(i); c <= pattern.charCodeAt(i+2); c++) chars.push(String.fromCharCode(c));
       i += 3;
-    } else {
-      chars.push(pattern[i]);
-      i++;
-    }
+    } else { chars.push(pattern[i]); i++; }
   }
-
   if (negate) {
-    // Para negación, generar letra minúscula aleatoria que no esté en el set
     const fallback = [];
-    for (let c = 32; c < 127; c++) {
-      const ch = String.fromCharCode(c);
-      if (!chars.includes(ch)) fallback.push(ch);
-    }
-    if (fallback.length === 0) return '?';
-    return fallback[Math.floor(Math.random() * fallback.length)];
+    for (let c = 32; c < 127; c++) { const ch = String.fromCharCode(c); if (!chars.includes(ch)) fallback.push(ch); }
+    return fallback.length ? fallback[Math.floor(Math.random() * fallback.length)] : '?';
   }
-
-  if (chars.length === 0) return '';
-  return chars[Math.floor(Math.random() * chars.length)];
+  return chars.length ? chars[Math.floor(Math.random() * chars.length)] : '';
 }
 
 function generateExamples() {
-  if (!parsedGrammar) {
-    addResult('warn', 'Gramática no compilada', 'Compila la gramática primero (⚡ Compilar gramática)');
-    return;
-  }
+  if (!parsedGrammar) { addResult('warn', 'Gramática no compilada', 'Compila la gramática primero (⚡ Compilar gramática)'); return; }
   const rootRule = document.getElementById('rootRuleSelect').value;
-  if (!rootRule) {
-    addResult('warn', 'Sin regla seleccionada', 'Selecciona la regla raíz en el dropdown.');
-    return;
-  }
-  if (!parsedGrammar[rootRule]) {
-    addResult('err', 'Regla no encontrada', `<${rootRule}> no existe en la gramática compilada.`);
-    return;
-  }
+  if (!rootRule) { addResult('warn', 'Sin regla seleccionada', 'Selecciona la regla raíz en el dropdown.'); return; }
+  if (!parsedGrammar[rootRule]) { addResult('err', 'Regla no encontrada', `<${rootRule}> no existe en la gramática compilada.`); return; }
 
-  const COUNT = 5;
-  const examples = [];
+  const COUNT = 5, examples = [];
   let attempts = 0;
   while (examples.length < COUNT && attempts < 80) {
     attempts++;
     try {
       const gen = generateFromNode(parsedGrammar[rootRule], parsedGrammar, 0);
-      // Verificar que el ejemplo generado sea válido
       const check = validate(gen, rootRule, parsedGrammar);
       if (check.ok && !examples.includes(gen)) examples.push(gen);
-    } catch(e) { /* ignorar errores individuales */ }
+    } catch(e) {}
   }
 
-  if (examples.length === 0) {
-    addResult('warn', `Sin ejemplos para <${rootRule}>`, 'No se pudieron generar ejemplos válidos. Puede haber recursión muy profunda o reglas sin terminales base.');
-    return;
-  }
-
+  if (!examples.length) { addResult('warn', `Sin ejemplos para <${rootRule}>`, 'No se pudieron generar ejemplos válidos.'); return; }
   genCount += examples.length;
   updateStatsBar();
 
   const listHtml = examples.map((ex, i) =>
-    `<div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+    `<div style="display:flex;align-items:center;gap:8px;margin-top:5px;">
       <span style="color:var(--accent3);font-size:0.7rem;min-width:16px">${i+1}.</span>
       <code style="flex:1;background:var(--surface);padding:3px 8px;border-radius:4px;word-break:break-all;">${escHtml(ex === '' ? '(cadena vacía)' : ex)}</code>
       <button onclick="useExample(${JSON.stringify(ex)})" style="font-family:inherit;font-size:0.65rem;padding:2px 8px;border-radius:4px;background:transparent;border:1px solid var(--border);color:var(--text-mid);cursor:pointer;" onmouseover="this.style.borderColor='var(--accent3)';this.style.color='var(--accent3)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-mid)'">usar ↗</button>
     </div>`
   ).join('');
-
-  addResult('info',
-    `✦ ${examples.length} ejemplos generados para <${rootRule}>`,
-    listHtml + (attempts >= 80 && examples.length < COUNT ? `<div style="margin-top:6px;color:var(--warn);font-size:0.72rem;">⚠ Solo se pudieron generar ${examples.length} de ${COUNT} ejemplos distintos.</div>` : '')
-  );
+  addResult('info', `✦ ${examples.length} ejemplos para <${rootRule}>`, listHtml + (attempts >= 80 && examples.length < COUNT ? `<div style="margin-top:6px;color:var(--warn);font-size:0.72rem;">⚠ Solo se generaron ${examples.length} de ${COUNT} ejemplos distintos.</div>` : ''));
 }
 
 function useExample(text) {
@@ -579,303 +647,142 @@ function useExample(text) {
   document.getElementById('testInput').focus();
 }
 
-
-// Tokenizer para la gramática
+// ── Tokenizador ────────────────────────────────────
 function tokenizeGrammar(src) {
   const tokens = [];
   let i = 0;
   while (i < src.length) {
-    // Saltar espacios y saltos de línea entre reglas (pero no dentro de literales)
-    if (src[i] === '\n' || src[i] === '\r') { i++; continue; }
-    if (src[i] === ' ' || src[i] === '\t') { i++; continue; }
-
-    // Comentario de línea con //
-    if (src[i] === '/' && src[i+1] === '/') {
-      while (i < src.length && src[i] !== '\n') i++;
-      continue;
-    }
-
-    // Comentario con #
-    if (src[i] === '#') {
-      while (i < src.length && src[i] !== '\n') i++;
-      continue;
-    }
-
-    // ::=
-    if (src.slice(i, i+3) === '::=') {
-      tokens.push({ type: 'ASSIGN', val: '::=' });
-      i += 3; continue;
-    }
-
-    // |
-    if (src[i] === '|') {
-      tokens.push({ type: 'ALT', val: '|' }); i++; continue;
-    }
-
-    // Cuantificadores
-    if (src[i] === '*') { tokens.push({ type: 'STAR' }); i++; continue; }
-    if (src[i] === '+') { tokens.push({ type: 'PLUS' }); i++; continue; }
-    if (src[i] === '?') { tokens.push({ type: 'OPT' }); i++; continue; }
-
-    // Paréntesis de agrupación
-    if (src[i] === '(') { tokens.push({ type: 'LPAREN' }); i++; continue; }
-    if (src[i] === ')') { tokens.push({ type: 'RPAREN' }); i++; continue; }
-
-    // Clase de caracteres [a-z], [A-Z], [0-9], [1-9]
+    if ('\n\r \t'.includes(src[i])) { i++; continue; }
+    if (src[i] === '/' && src[i+1] === '/') { while (i < src.length && src[i] !== '\n') i++; continue; }
+    if (src[i] === '#') { while (i < src.length && src[i] !== '\n') i++; continue; }
+    if (src.slice(i,i+3) === '::=') { tokens.push({type:'ASSIGN',val:'::='}); i+=3; continue; }
+    if (src[i] === '|') { tokens.push({type:'ALT',val:'|'}); i++; continue; }
+    if (src[i] === '*') { tokens.push({type:'STAR'}); i++; continue; }
+    if (src[i] === '+') { tokens.push({type:'PLUS'}); i++; continue; }
+    if (src[i] === '?') { tokens.push({type:'OPT'}); i++; continue; }
+    if (src[i] === '(') { tokens.push({type:'LPAREN'}); i++; continue; }
+    if (src[i] === ')') { tokens.push({type:'RPAREN'}); i++; continue; }
     if (src[i] === '[') {
-      let j = i + 1;
-      while (j < src.length && src[j] !== ']') j++;
-      const inner = src.slice(i+1, j);
-      tokens.push({ type: 'CHARCLASS', val: inner });
-      i = j + 1; continue;
+      let j = i+1; while (j < src.length && src[j] !== ']') j++;
+      tokens.push({type:'CHARCLASS',val:src.slice(i+1,j)}); i=j+1; continue;
     }
-
-    // Literal entre comillas dobles
     if (src[i] === '"') {
-      let j = i + 1;
-      while (j < src.length && src[j] !== '"') {
-        if (src[j] === '\\') j++;
-        j++;
-      }
-      const lit = src.slice(i+1, j);
-      tokens.push({ type: 'LITERAL', val: lit });
-      i = j + 1; continue;
+      let j = i+1; while (j < src.length && src[j] !== '"') { if (src[j]==='\\') j++; j++; }
+      tokens.push({type:'LITERAL',val:src.slice(i+1,j)}); i=j+1; continue;
     }
-
-    // Literal entre comillas simples
     if (src[i] === "'") {
-      let j = i + 1;
-      while (j < src.length && src[j] !== "'") {
-        if (src[j] === '\\') j++;
-        j++;
-      }
-      const lit = src.slice(i+1, j);
-      tokens.push({ type: 'LITERAL', val: lit });
-      i = j + 1; continue;
+      let j = i+1; while (j < src.length && src[j] !== "'") { if (src[j]==='\\') j++; j++; }
+      tokens.push({type:'LITERAL',val:src.slice(i+1,j)}); i=j+1; continue;
     }
-
-    // No-terminal <nombre>
     if (src[i] === '<') {
-      let j = i + 1;
-      while (j < src.length && src[j] !== '>') j++;
-      const name = src.slice(i+1, j);
-      tokens.push({ type: 'NONTERMINAL', val: name });
-      i = j + 1; continue;
+      let j = i+1; while (j < src.length && src[j] !== '>') j++;
+      tokens.push({type:'NONTERMINAL',val:src.slice(i+1,j)}); i=j+1; continue;
     }
-
     i++;
   }
   return tokens;
 }
 
-// Parser de la gramática (convierte tokens en AST de reglas)
+// ── Parser de gramática ────────────────────────────
 function parseGrammarTokens(tokens) {
   const rules = {};
   let i = 0;
 
   function parseAlternatives() {
     const alts = [parseSequence()];
-    while (i < tokens.length && tokens[i]?.type === 'ALT') {
-      i++; // consumir |
-      alts.push(parseSequence());
-    }
-    return alts.length === 1 ? alts[0] : { type: 'ALT', alts };
+    while (i < tokens.length && tokens[i]?.type === 'ALT') { i++; alts.push(parseSequence()); }
+    return alts.length === 1 ? alts[0] : {type:'ALT',alts};
   }
-
   function parseSequence() {
     const items = [];
     while (i < tokens.length) {
       const t = tokens[i];
-      if (!t || t.type === 'ALT' || t.type === 'RPAREN') break;
-      if (t.type === 'ASSIGN') break;
-      // Si el siguiente token es un NONTERMINAL que podría ser el lado izq de una regla
-      // (seguido de ASSIGN), parar
-      if (t.type === 'NONTERMINAL' && tokens[i+1]?.type === 'ASSIGN') break;
+      if (!t || t.type==='ALT' || t.type==='RPAREN' || t.type==='ASSIGN') break;
+      if (t.type==='NONTERMINAL' && tokens[i+1]?.type==='ASSIGN') break;
       items.push(parsePrimary());
     }
-    if (items.length === 0) return { type: 'EMPTY' };
-    if (items.length === 1) return items[0];
-    return { type: 'SEQ', items };
+    if (!items.length) return {type:'EMPTY'};
+    return items.length===1 ? items[0] : {type:'SEQ',items};
   }
-
   function parsePrimary() {
     let node = parseAtom();
-    // Cuantificadores
     if (i < tokens.length) {
-      if (tokens[i]?.type === 'STAR') { i++; return { type: 'STAR', inner: node }; }
-      if (tokens[i]?.type === 'PLUS') { i++; return { type: 'PLUS', inner: node }; }
-      if (tokens[i]?.type === 'OPT')  { i++; return { type: 'OPT',  inner: node }; }
+      if (tokens[i]?.type==='STAR') { i++; return {type:'STAR',inner:node}; }
+      if (tokens[i]?.type==='PLUS') { i++; return {type:'PLUS',inner:node}; }
+      if (tokens[i]?.type==='OPT')  { i++; return {type:'OPT', inner:node}; }
     }
     return node;
   }
-
   function parseAtom() {
     const t = tokens[i];
-    if (!t) return { type: 'EMPTY' };
-
-    if (t.type === 'LPAREN') {
-      i++;
-      const inner = parseAlternatives();
-      if (tokens[i]?.type === 'RPAREN') i++;
-      return inner;
-    }
-    if (t.type === 'LITERAL') {
-      i++;
-      return { type: 'LITERAL', val: processEscapes(t.val) };
-    }
-    if (t.type === 'NONTERMINAL') {
-      i++;
-      return { type: 'NONTERMINAL', name: t.val };
-    }
-    if (t.type === 'CHARCLASS') {
-      i++;
-      return { type: 'CHARCLASS', val: t.val };
-    }
-    i++;
-    return { type: 'EMPTY' };
+    if (!t) return {type:'EMPTY'};
+    if (t.type==='LPAREN') { i++; const inner=parseAlternatives(); if(tokens[i]?.type==='RPAREN') i++; return inner; }
+    if (t.type==='LITERAL')    { i++; return {type:'LITERAL',val:processEscapes(t.val)}; }
+    if (t.type==='NONTERMINAL'){ i++; return {type:'NONTERMINAL',name:t.val}; }
+    if (t.type==='CHARCLASS')  { i++; return {type:'CHARCLASS',val:t.val}; }
+    i++; return {type:'EMPTY'};
   }
-
   function processEscapes(s) {
-    return s.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\r/g, '\r');
+    return s.replace(/\\n/g,'\n').replace(/\\t/g,'\t').replace(/\\r/g,'\r');
   }
 
-  // Parsear todas las reglas
   while (i < tokens.length) {
-    if (tokens[i]?.type === 'NONTERMINAL' && tokens[i+1]?.type === 'ASSIGN') {
-      const name = tokens[i].val;
-      i += 2; // saltar nombre y ::=
-      const def = parseAlternatives();
-      rules[name] = def;
-    } else {
-      i++;
-    }
+    if (tokens[i]?.type==='NONTERMINAL' && tokens[i+1]?.type==='ASSIGN') {
+      const name = tokens[i].val; i+=2;
+      rules[name] = parseAlternatives();
+    } else i++;
   }
-
   return rules;
 }
 
-// Matcher: intenta hacer match del AST contra una cadena
-// Devuelve array de posiciones finales posibles (memoized)
-const matchCache = {};
-
+// ── Matcher ────────────────────────────────────────
 function matchNode(node, str, pos, rules, depth) {
-  if (depth > 200) return []; // protección recursión
-
-  const key = `${node.type}:${pos}`;
-
-  if (!node) return [pos];
-
+  if (depth > 200 || !node) return node ? [pos] : [];
   switch (node.type) {
-    case 'EMPTY':
-      return [pos];
-
-    case 'LITERAL': {
-      const val = node.val;
-      // Comparación con escape de salto de línea, etc.
-      if (str.startsWith(val, pos)) return [pos + val.length];
-      return [];
-    }
-
-    case 'CHARCLASS': {
-      if (pos >= str.length) return [];
-      const ch = str[pos];
-      if (matchCharClass(node.val, ch)) return [pos + 1];
-      return [];
-    }
-
-    case 'NONTERMINAL': {
-      const rule = rules[node.name];
-      if (!rule) return []; // regla no definida
-      return matchNode(rule, str, pos, rules, depth + 1);
-    }
-
+    case 'EMPTY': return [pos];
+    case 'LITERAL': return str.startsWith(node.val, pos) ? [pos+node.val.length] : [];
+    case 'CHARCLASS': return pos < str.length && matchCharClass(node.val, str[pos]) ? [pos+1] : [];
+    case 'NONTERMINAL': { const rule=rules[node.name]; return rule ? matchNode(rule,str,pos,rules,depth+1) : []; }
     case 'ALT': {
-      const results = new Set();
-      for (const alt of node.alts) {
-        for (const p of matchNode(alt, str, pos, rules, depth + 1)) results.add(p);
-      }
-      return [...results];
+      const r=new Set();
+      for (const a of node.alts) for (const p of matchNode(a,str,pos,rules,depth+1)) r.add(p);
+      return [...r];
     }
-
     case 'SEQ': {
-      let positions = [pos];
+      let positions=[pos];
       for (const item of node.items) {
-        const next = new Set();
-        for (const p of positions) {
-          for (const np of matchNode(item, str, p, rules, depth + 1)) next.add(np);
-        }
-        positions = [...next];
-        if (positions.length === 0) return [];
+        const next=new Set();
+        for (const p of positions) for (const np of matchNode(item,str,p,rules,depth+1)) next.add(np);
+        positions=[...next]; if(!positions.length) return [];
       }
       return positions;
     }
-
     case 'STAR': {
-      const results = new Set();
-      let frontier = [pos];
-      results.add(pos);
-      let safety = 0;
-      while (frontier.length > 0 && safety++ < 500) {
-        const next = new Set();
-        for (const p of frontier) {
-          for (const np of matchNode(node.inner, str, p, rules, depth + 1)) {
-            if (!results.has(np)) { results.add(np); next.add(np); }
-          }
-        }
-        frontier = [...next];
-      }
-      return [...results];
+      const r=new Set(); let frontier=[pos]; r.add(pos); let s=0;
+      while(frontier.length&&s++<500){const next=new Set();for(const p of frontier)for(const np of matchNode(node.inner,str,p,rules,depth+1))if(!r.has(np)){r.add(np);next.add(np);}frontier=[...next];}
+      return [...r];
     }
-
     case 'PLUS': {
-      const first = matchNode(node.inner, str, pos, rules, depth + 1);
-      if (first.length === 0) return [];
-      const results = new Set(first);
-      let frontier = [...first];
-      let safety = 0;
-      while (frontier.length > 0 && safety++ < 500) {
-        const next = new Set();
-        for (const p of frontier) {
-          for (const np of matchNode(node.inner, str, p, rules, depth + 1)) {
-            if (!results.has(np)) { results.add(np); next.add(np); }
-          }
-        }
-        frontier = [...next];
-      }
-      return [...results];
+      const first=matchNode(node.inner,str,pos,rules,depth+1); if(!first.length) return [];
+      const r=new Set(first); let frontier=[...first]; let s=0;
+      while(frontier.length&&s++<500){const next=new Set();for(const p of frontier)for(const np of matchNode(node.inner,str,p,rules,depth+1))if(!r.has(np)){r.add(np);next.add(np);}frontier=[...next];}
+      return [...r];
     }
-
-    case 'OPT': {
-      const results = new Set([pos]);
-      for (const p of matchNode(node.inner, str, pos, rules, depth + 1)) results.add(p);
-      return [...results];
-    }
-
-    default:
-      return [pos];
+    case 'OPT': { const r=new Set([pos]); for(const p of matchNode(node.inner,str,pos,rules,depth+1)) r.add(p); return [...r]; }
+    default: return [pos];
   }
 }
 
 function matchCharClass(pattern, ch) {
-  // Soporta [a-z], [A-Z], [0-9], [1-9], [^...], combinaciones
-  let i = 0;
-  let negate = false;
-  if (pattern[0] === '^') { negate = true; i = 1; }
-
-  let matched = false;
-  while (i < pattern.length) {
-    if (i + 2 < pattern.length && pattern[i+1] === '-') {
-      if (ch >= pattern[i] && ch <= pattern[i+2]) { matched = true; }
-      i += 3;
-    } else {
-      if (ch === pattern[i]) { matched = true; }
-      i++;
-    }
+  let i=0, negate=false, matched=false;
+  if (pattern[0]==='^') { negate=true; i=1; }
+  while (i<pattern.length) {
+    if (i+2<pattern.length && pattern[i+1]==='-') { if(ch>=pattern[i]&&ch<=pattern[i+2]) matched=true; i+=3; }
+    else { if(ch===pattern[i]) matched=true; i++; }
   }
   return negate ? !matched : matched;
 }
 
-// Validar una cadena contra una regla
 function validate(inputStr, rootRule, rules) {
   if (!rules[rootRule]) return { ok: false, error: `Regla <${rootRule}> no encontrada` };
   const node = rules[rootRule];
@@ -883,60 +790,77 @@ function validate(inputStr, rootRule, rules) {
   const fullMatch = results.includes(inputStr.length);
   if (fullMatch) return { ok: true };
 
-  // Encontrar hasta dónde llegó el parser
-  const maxPos = results.length > 0 ? Math.max(...results) : 0;
+  const maxPos = results.length ? Math.max(...results) : 0;
   return {
     ok: false,
     maxPos,
+    inputStr,
     snippet: inputStr.slice(0, maxPos) + '⚑' + inputStr.slice(maxPos),
     error: maxPos === 0
-      ? `No coincide desde el inicio`
-      : `Match parcial hasta posición ${maxPos}: "${inputStr.slice(0, maxPos)}" ✓, luego falla`
+      ? `No hubo coincidencia desde el inicio`
+      : `Match parcial — el parser avanzó ${maxPos} de ${inputStr.length} caracteres`
   };
 }
 
-// =====================================================
-// UI
-// =====================================================
+// ── Renderizador de error detallado ───────────────
+function buildErrorDetail(result, rootRule, inputStr) {
+  const { maxPos } = result;
+  const okPart  = inputStr.slice(0, maxPos);
+  const failChar = inputStr[maxPos] ?? '';
+  const rest     = inputStr.slice(maxPos + 1);
+  const pct      = inputStr.length ? Math.round(maxPos / inputStr.length * 100) : 0;
 
+  // Traza visual carácter por carácter
+  let traceHtml = '<div class="trace-bar">';
+  for (let i = 0; i < inputStr.length; i++) {
+    const ch = escHtml(inputStr[i] === ' ' ? '·' : inputStr[i]);
+    if (i < maxPos)       traceHtml += `<span class="trace-char ok-ch"  title="pos ${i}: OK">${ch}</span>`;
+    else if (i === maxPos) traceHtml += `<span class="trace-char fail-ch" title="pos ${i}: falla aquí">${ch || 'EOF'}</span>`;
+    else                  traceHtml += `<span class="trace-char rest-ch" title="pos ${i}">${ch}</span>`;
+  }
+  if (maxPos >= inputStr.length) traceHtml += `<span class="trace-char fail-ch" title="EOF: falla aquí">EOF</span>`;
+  traceHtml += '</div>';
+
+  let html = `<div class="err-detail">`;
+  html += `<div class="err-detail-row"><span class="err-key">Regla</span><span class="err-val">&lt;${escHtml(rootRule)}&gt;</span></div>`;
+  html += `<div class="err-detail-row"><span class="err-key">Entrada</span><span class="err-val"><code>${escHtml(inputStr || '(vacío)')}</code></span></div>`;
+  html += `<div class="err-detail-row"><span class="err-key">Avance</span><span class="err-val ok-part">${maxPos}/${inputStr.length} chars (${pct}%)</span></div>`;
+  if (maxPos > 0) html += `<div class="err-detail-row"><span class="err-key">Parte OK</span><span class="err-val ok-part"><code>${escHtml(okPart)}</code></span></div>`;
+  if (failChar !== '') html += `<div class="err-detail-row"><span class="err-key">Falla en</span><span class="err-val highlight"><code>'${escHtml(failChar)}'</code> (pos ${maxPos}, char ${failChar.charCodeAt(0)})</span></div>`;
+  else html += `<div class="err-detail-row"><span class="err-key">Falla en</span><span class="err-val highlight">Fin de cadena — se esperaba más input</span></div>`;
+  html += `<div class="err-detail-row"><span class="err-key">Traza</span></div>${traceHtml}`;
+  html += `</div>`;
+
+  return html;
+}
+
+// ── UI ─────────────────────────────────────────────
 function parseGrammar() {
   const src = document.getElementById('grammarInput').value.trim();
   if (!src) { addResult('warn', 'Gramática vacía', 'Escribe una gramática BNF primero.'); return; }
-
   try {
     const tokens = tokenizeGrammar(src);
     const rules = parseGrammarTokens(tokens);
     const ruleNames = Object.keys(rules);
-
-    if (ruleNames.length === 0) {
-      addResult('err', 'Sin reglas', 'No se detectaron reglas. Verifica la sintaxis (usa <nombre> ::= ...)');
-      return;
-    }
-
+    if (!ruleNames.length) { addResult('err', 'Sin reglas detectadas', 'Verifica la sintaxis. Usa: <nombre> ::= ...'); return; }
     parsedGrammar = rules;
     updateRulesList(ruleNames);
     updateStatsBar();
-
-    addResult('ok', `Gramática compilada`, `Se detectaron ${ruleNames.length} reglas: ${ruleNames.map(r => `<${r}>`).join(', ')}`);
-
-    // Verificar referencias a reglas no definidas
+    addResult('ok', `Gramática compilada — ${ruleNames.length} regla${ruleNames.length>1?'s':''}`,
+      `Reglas: ${ruleNames.map(r=>`<code>&lt;${escHtml(r)}&gt;</code>`).join(' ')}`);
     const warnings = checkUndefinedRefs(rules, ruleNames);
-    if (warnings.length > 0) {
-      addResult('warn', 'Referencias no definidas', `Las siguientes reglas son referenciadas pero no definidas: ${warnings.map(r => `<${r}>`).join(', ')}`);
-    }
-
+    if (warnings.length) addResult('warn', 'Referencias sin definir', `Referenciadas pero no definidas: ${warnings.map(r=>`<code>&lt;${escHtml(r)}&gt;</code>`).join(' ')}`);
   } catch(e) {
     addResult('err', 'Error de compilación', e.message);
   }
 }
 
 function checkUndefinedRefs(rules, defined) {
-  const defSet = new Set(defined);
-  const missing = new Set();
+  const defSet = new Set(defined), missing = new Set();
   function walk(node) {
     if (!node) return;
-    if (node.type === 'NONTERMINAL' && !defSet.has(node.name)) missing.add(node.name);
-    if (node.alts) node.alts.forEach(walk);
+    if (node.type==='NONTERMINAL' && !defSet.has(node.name)) missing.add(node.name);
+    if (node.alts)  node.alts.forEach(walk);
     if (node.items) node.items.forEach(walk);
     if (node.inner) walk(node.inner);
   }
@@ -945,45 +869,39 @@ function checkUndefinedRefs(rules, defined) {
 }
 
 function validateInput() {
-  if (!parsedGrammar) {
-    addResult('warn', 'Gramática no compilada', 'Compila la gramática primero (⚡ Compilar gramática)');
-    return;
-  }
+  if (!parsedGrammar) { addResult('warn', 'Gramática no compilada', 'Compila la gramática primero.'); return; }
   const input = document.getElementById('testInput').value;
   const rootRule = document.getElementById('rootRuleSelect').value;
-  if (!rootRule) {
-    addResult('warn', 'Sin regla seleccionada', 'Selecciona la regla raíz en el dropdown de arriba.');
-    return;
-  }
+  if (!rootRule) { addResult('warn', 'Sin regla seleccionada', 'Selecciona la regla raíz en el dropdown.'); return; }
 
   const result = validate(input, rootRule, parsedGrammar);
   totalValidations++;
 
   if (result.ok) {
     validCount++;
-    addResult('ok', `✓ Válido contra <${rootRule}>`, `La entrada <code>${escHtml(input || '(vacío)')}</code> es válida.`);
+    addResult('ok', `✓ Válido contra <${escHtml(rootRule)}>`,
+      `La entrada <code>${escHtml(input || '(vacío)')}</code> satisface la gramática.`);
   } else {
     invalidCount++;
-    addResult('err', `✗ Inválido contra <${rootRule}>`, result.error + (result.snippet ? `<br>Traza: <code>${escHtml(result.snippet)}</code>` : ''));
+    const detailHtml = buildErrorDetail(result, rootRule, input);
+    addResult('err', `✗ No válido contra <${escHtml(rootRule)}>`, result.error + detailHtml);
   }
-
   updateStatsBar();
 }
 
 function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 function addResult(type, label, text) {
   const container = document.getElementById('resultsContainer');
   const empty = container.querySelector('.empty-state');
   if (empty) empty.remove();
-
-  const icons = { ok: '✓', err: '✗', info: 'ℹ', warn: '⚠' };
+  const icons = { ok:'✓', err:'✗', info:'ℹ', warn:'⚠' };
   const div = document.createElement('div');
   div.className = `result-item ${type}`;
   div.innerHTML = `
-    <div class="result-icon">${icons[type] || '·'}</div>
+    <div class="result-icon">${icons[type]||'·'}</div>
     <div class="result-content">
       <div class="result-label">${label}</div>
       <div class="result-text">${text}</div>
@@ -997,62 +915,43 @@ function updateRulesList(ruleNames) {
   const select = document.getElementById('rootRuleSelect');
   list.innerHTML = '';
   select.innerHTML = '<option value="">— regla raíz —</option>';
-
   ruleNames.forEach((name, idx) => {
     const chip = document.createElement('div');
     chip.className = 'rule-chip';
     chip.textContent = `<${name}>`;
-    chip.onclick = () => {
-      document.querySelectorAll('.rule-chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      select.value = name;
-    };
+    chip.onclick = () => { document.querySelectorAll('.rule-chip').forEach(c=>c.classList.remove('active')); chip.classList.add('active'); select.value = name; };
     list.appendChild(chip);
-
-    const opt = document.createElement('option');
-    opt.value = name;
-    opt.textContent = `<${name}>`;
-    select.appendChild(opt);
-
-    if (idx === 0) { select.value = name; chip.classList.add('active'); }
+    const opt = document.createElement('option'); opt.value=name; opt.textContent=`<${name}>`; select.appendChild(opt);
+    if (idx===0) { select.value=name; chip.classList.add('active'); }
   });
-
-  // Al hacer clic en el select, activar el chip correspondiente
-  select.onchange = () => {
-    document.querySelectorAll('.rule-chip').forEach(c => {
-      c.classList.toggle('active', c.textContent === `<${select.value}>`);
-    });
-  };
+  select.onchange = () => { document.querySelectorAll('.rule-chip').forEach(c=>c.classList.toggle('active',c.textContent===`<${select.value}>`)); };
 }
 
 function updateStatsBar() {
-  const bar = document.getElementById('statsBar');
-  bar.style.display = 'flex';
+  const bar = document.getElementById('statsBar'); bar.style.display='flex';
   document.getElementById('statRules').textContent = parsedGrammar ? Object.keys(parsedGrammar).length : 0;
   document.getElementById('statTotal').textContent = totalValidations;
-  document.getElementById('statOk').textContent = validCount;
-  document.getElementById('statErr').textContent = invalidCount;
-  document.getElementById('statGen').textContent = genCount;
+  document.getElementById('statOk').textContent   = validCount;
+  document.getElementById('statErr').textContent  = invalidCount;
+  document.getElementById('statGen').textContent  = genCount;
 }
 
 function clearResults() {
-  document.getElementById('resultsContainer').innerHTML = '<div class="empty-state">Los resultados de validación aparecerán aquí</div>';
-  validCount = 0; invalidCount = 0; totalValidations = 0; genCount = 0;
-  updateStatsBar();
-  document.getElementById('statsBar').style.display = 'none';
+  document.getElementById('resultsContainer').innerHTML = '<div class="empty-state">Los resultados aparecerán aquí · Arrastra el borde superior para redimensionar</div>';
+  validCount=0; invalidCount=0; totalValidations=0; genCount=0;
+  updateStatsBar(); document.getElementById('statsBar').style.display='none';
 }
 
 function clearAll() {
-  document.getElementById('grammarInput').value = '';
-  document.getElementById('testInput').value = '';
-  document.getElementById('rulesList').innerHTML = '<span class="empty-state">Compila la gramática para ver las reglas</span>';
-  document.getElementById('rootRuleSelect').innerHTML = '<option value="">— regla raíz —</option>';
-  parsedGrammar = null;
-  clearResults();
+  document.getElementById('grammarInput').value='';
+  document.getElementById('testInput').value='';
+  document.getElementById('rulesList').innerHTML='<span class="empty-state">Compila la gramática para ver las reglas</span>';
+  document.getElementById('rootRuleSelect').innerHTML='<option value="">— regla raíz —</option>';
+  parsedGrammar=null; clearResults();
 }
 
 function loadExample() {
-  document.getElementById('grammarInput').value = `<letra> ::= [a-z] | [A-Z]
+  document.getElementById('grammarInput').value=`<letra> ::= [a-z] | [A-Z]
 <letras> ::= <letra>+
 <digito> ::= [0-9]
 <digito_no_0> ::= [1-9]
@@ -1073,22 +972,15 @@ function loadExample() {
 <asignacion_var> ::= <asignacion> <expresion>
 <crear_var> ::= <tipos_datos> <separador> <identificador> <asignacion_var>? <final_expresion>`;
   parseGrammar();
-  document.getElementById('testInput').value = 'int~miVariable<-42!';
-  document.getElementById('rootRuleSelect').value = 'crear_var';
-  document.querySelectorAll('.rule-chip').forEach(c => {
-    c.classList.toggle('active', c.textContent === '<crear_var>');
-  });
+  document.getElementById('testInput').value='int~miVariable<-42!';
+  const sel = document.getElementById('rootRuleSelect'); sel.value='crear_var';
+  document.querySelectorAll('.rule-chip').forEach(c=>c.classList.toggle('active',c.textContent==='<crear_var>'));
 }
 
-// Atajos de teclado
 document.addEventListener('keydown', e => {
-  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+  if ((e.ctrlKey||e.metaKey) && e.key==='Enter') {
     e.preventDefault();
-    if (document.activeElement === document.getElementById('testInput')) {
-      validateInput();
-    } else {
-      parseGrammar();
-    }
+    document.activeElement===document.getElementById('testInput') ? validateInput() : parseGrammar();
   }
 });
 </script>
