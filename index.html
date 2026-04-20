@@ -88,7 +88,6 @@
   .btn-danger { background: transparent; color: var(--err); border: 1px solid #ff5e8a44; }
   .btn-danger:hover { background: #ff5e8a18; }
 
-  /* ── Layout principal: columnas + terminal abajo ── */
   .workspace {
     display: flex;
     flex-direction: column;
@@ -213,13 +212,11 @@
   .validate-btn:hover { filter: brightness(1.15); }
   .validate-btn + .validate-btn { border-left: 1px solid rgba(0,0,0,0.2); }
 
-  /* ── Terminal / Panel de resultados ── */
   .terminal-section {
     border-top: 1px solid var(--border);
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    /* altura inicial, el usuario puede arrastrar el resizer */
   }
 
   .terminal-resizer {
@@ -345,7 +342,6 @@
     word-break: break-all;
   }
 
-  /* Bloque de error detallado */
   .err-detail {
     margin-top: 8px;
     background: var(--surface);
@@ -373,7 +369,6 @@
   .err-val.highlight { color: var(--err); }
   .err-val.ok-part { color: var(--ok); }
 
-  /* Visor de traza de posición */
   .trace-bar {
     display: flex;
     flex-wrap: wrap;
@@ -438,6 +433,7 @@
 Ejemplo:
 <letra> ::= [a-z] | [A-Z]
 <palabra> ::= <letra>+
+<dos_aas> ::= [a]{2}
 <saludo> ::= &quot;hola&quot; | &quot;adios&quot;"></textarea>
     </div>
 
@@ -466,10 +462,10 @@ Ejemplo:
     </div>
   </div>
 
-  <!-- Resizer arrastrble -->
+  <!-- Resizer arrastrable -->
   <div class="terminal-resizer" id="resizer"></div>
 
-  <!-- Terminal de resultados (altura variable) -->
+  <!-- Terminal de resultados -->
   <div class="terminal-section" id="terminalSection">
     <div class="terminal-header">
       <div class="dot"></div>
@@ -501,7 +497,6 @@ Ejemplo:
 (function() {
   const resizer = document.getElementById('resizer');
   const termSection = document.getElementById('terminalSection');
-  const columns = document.getElementById('columns');
   const hint = document.getElementById('termSizeHint');
 
   const DEFAULT_HEIGHT = 260;
@@ -531,7 +526,7 @@ Ejemplo:
 
   document.addEventListener('mousemove', e => {
     if (!isResizing) return;
-    const delta = startY - e.clientY; // arrastrar hacia arriba = más grande
+    const delta = startY - e.clientY;
     applyHeight(startHeight + delta);
   });
 
@@ -584,6 +579,12 @@ function generateFromNode(node, rules, depth) {
     }
     case 'OPT':
       return (depth > 30 || Math.random() < 0.4) ? '' : generateFromNode(node.inner, rules, depth + 1);
+    // ── NUEVO: cuantificador exacto {n} ──
+    case 'REPEAT': {
+      let s = '';
+      for (let i = 0; i < node.n; i++) s += generateFromNode(node.inner, rules, depth + 1);
+      return s;
+    }
     default: return '';
   }
 }
@@ -662,6 +663,18 @@ function tokenizeGrammar(src) {
     if (src[i] === '?') { tokens.push({type:'OPT'}); i++; continue; }
     if (src[i] === '(') { tokens.push({type:'LPAREN'}); i++; continue; }
     if (src[i] === ')') { tokens.push({type:'RPAREN'}); i++; continue; }
+    // ── NUEVO: cuantificador exacto {n} ──
+    if (src[i] === '{') {
+      let j = i + 1;
+      while (j < src.length && src[j] !== '}') j++;
+      const raw = src.slice(i + 1, j).trim();
+      const n = parseInt(raw, 10);
+      if (!isNaN(n) && n >= 0) {
+        tokens.push({ type: 'REPEAT', n });
+      }
+      i = j + 1;
+      continue;
+    }
     if (src[i] === '[') {
       let j = i+1; while (j < src.length && src[j] !== ']') j++;
       tokens.push({type:'CHARCLASS',val:src.slice(i+1,j)}); i=j+1; continue;
@@ -706,10 +719,20 @@ function parseGrammarTokens(tokens) {
   }
   function parsePrimary() {
     let node = parseAtom();
-    if (i < tokens.length) {
-      if (tokens[i]?.type==='STAR') { i++; return {type:'STAR',inner:node}; }
-      if (tokens[i]?.type==='PLUS') { i++; return {type:'PLUS',inner:node}; }
-      if (tokens[i]?.type==='OPT')  { i++; return {type:'OPT', inner:node}; }
+    // Puede haber múltiples cuantificadores encadenados
+    let changed = true;
+    while (changed && i < tokens.length) {
+      changed = false;
+      if (tokens[i]?.type === 'STAR')   { i++; node = {type:'STAR',  inner:node}; changed = true; }
+      else if (tokens[i]?.type === 'PLUS')   { i++; node = {type:'PLUS',  inner:node}; changed = true; }
+      else if (tokens[i]?.type === 'OPT')    { i++; node = {type:'OPT',   inner:node}; changed = true; }
+      // ── NUEVO: cuantificador exacto {n} ──
+      else if (tokens[i]?.type === 'REPEAT') {
+        const n = tokens[i].n;
+        i++;
+        node = {type:'REPEAT', inner:node, n};
+        changed = true;
+      }
     }
     return node;
   }
@@ -768,7 +791,24 @@ function matchNode(node, str, pos, rules, depth) {
       while(frontier.length&&s++<500){const next=new Set();for(const p of frontier)for(const np of matchNode(node.inner,str,p,rules,depth+1))if(!r.has(np)){r.add(np);next.add(np);}frontier=[...next];}
       return [...r];
     }
-    case 'OPT': { const r=new Set([pos]); for(const p of matchNode(node.inner,str,pos,rules,depth+1)) r.add(p); return [...r]; }
+    case 'OPT': {
+      const r=new Set([pos]);
+      for(const p of matchNode(node.inner,str,pos,rules,depth+1)) r.add(p);
+      return [...r];
+    }
+    // ── NUEVO: cuantificador exacto {n} ──
+    case 'REPEAT': {
+      let positions = [pos];
+      for (let i = 0; i < node.n; i++) {
+        const next = new Set();
+        for (const p of positions)
+          for (const np of matchNode(node.inner, str, p, rules, depth + 1))
+            next.add(np);
+        positions = [...next];
+        if (!positions.length) return [];
+      }
+      return positions;
+    }
     default: return [pos];
   }
 }
@@ -807,10 +847,8 @@ function buildErrorDetail(result, rootRule, inputStr) {
   const { maxPos } = result;
   const okPart  = inputStr.slice(0, maxPos);
   const failChar = inputStr[maxPos] ?? '';
-  const rest     = inputStr.slice(maxPos + 1);
   const pct      = inputStr.length ? Math.round(maxPos / inputStr.length * 100) : 0;
 
-  // Traza visual carácter por carácter
   let traceHtml = '<div class="trace-bar">';
   for (let i = 0; i < inputStr.length; i++) {
     const ch = escHtml(inputStr[i] === ' ' ? '·' : inputStr[i]);
@@ -919,12 +957,18 @@ function updateRulesList(ruleNames) {
     const chip = document.createElement('div');
     chip.className = 'rule-chip';
     chip.textContent = `<${name}>`;
-    chip.onclick = () => { document.querySelectorAll('.rule-chip').forEach(c=>c.classList.remove('active')); chip.classList.add('active'); select.value = name; };
+    chip.onclick = () => {
+      document.querySelectorAll('.rule-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      select.value = name;
+    };
     list.appendChild(chip);
     const opt = document.createElement('option'); opt.value=name; opt.textContent=`<${name}>`; select.appendChild(opt);
     if (idx===0) { select.value=name; chip.classList.add('active'); }
   });
-  select.onchange = () => { document.querySelectorAll('.rule-chip').forEach(c=>c.classList.toggle('active',c.textContent===`<${select.value}>`)); };
+  select.onchange = () => {
+    document.querySelectorAll('.rule-chip').forEach(c=>c.classList.toggle('active',c.textContent===`<${select.value}>`));
+  };
 }
 
 function updateStatsBar() {
